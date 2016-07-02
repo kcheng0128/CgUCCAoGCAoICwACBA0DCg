@@ -1,0 +1,19 @@
+{
+  "name": "CgUCCAoGCAoICwACBA0DCg",
+  "version": "0.9.0",
+  "description": "",
+  "main": "consumerWorker.js",
+  "scripts": {
+    "start": "node consumerWorker.js",
+    "test": "node ./test/unitTest.js"
+  },
+  "author": "K Cheng",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.4.1",
+    "co": "^4.6.0",
+    "fivebeans": "^1.4.1",
+    "mongodb": "^2.1.18",
+    "winston": "^2.2.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+	"tubeName": "kcheng0128",
+	"test": {
+		"defaultTimeToRun": 180,
+		"defaultPriority": 5
+	},	
+	"server": {
+		"host": "challenge.aftership.net",
+		"port": 11300
+	}
+}

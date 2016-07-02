@@ -1,0 +1,9 @@
+{
+	"filename": "consumeWorker.log",
+	"level": "debug",
+	"json": false,
+	"eol": "\r\n",
+	"timestamp": true,	
+    "handleExceptions": true,
+    "humanReadableUnhandledException": true
+}
