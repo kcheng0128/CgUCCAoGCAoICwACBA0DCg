@@ -89,6 +89,15 @@ let exchangeRateSourceToUse = exchangeRateSource.XeDotComExchangeRateSource;
 // create consumer and setup
 const consumer = new fivebeans.client(beanstalkConfig.server.host, beanstalkConfig.server.port);
 const producer = new fivebeans.client(beanstalkConfig.server.host, beanstalkConfig.server.port);
+
+/**
+ * Perform looping of the connection of consumer and producer (when not connected), as well as the method consuming the job
+ *
+ * @param {ExchangeRateSource} exchangeRateSourceUsed	A ExchangeRateSource (see /model/exchangeRateSource.js) that should be used
+ * @param {function} consumeJob							A function which consumes job
+ * @param {object} value								The value returned from last promise
+ * @return {bluebrid Promise}							A promise which loops the connection of consumer and producer, as well as the method consuming the job
+ */
 let eventLoop = BluebirdPromise.method(function eventLoopInner(exchangeRateSourceUsed, consumeJob, value) {
 	console.log('In event loop');
 	if (!isConsumerReady) {

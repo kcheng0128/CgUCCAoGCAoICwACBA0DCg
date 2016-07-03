@@ -9,11 +9,14 @@ const assert = require('assert');
 // 3rd party libraries
 const fivebeans = require('fivebeans');
 const BluebirdPromise = require('bluebird');
+const MongoClient = require('mongodb').MongoClient;
 
 const jobProcessing = require('../jobProcessing');
 const beanstalkConfig = require('../config/beanstalkd');
 const exchangeRateUtil = require('../util/exchangeRateUtil');
 const exchangeRateSource = require('../model/exchangeRateSource');
+const dbOperations = require('../dbOperations');
+const dbConfig = require('../config/db');
 
 /**
  * Test the methods related to ending condition of jobs
@@ -277,6 +280,9 @@ const producerSetupTest = function producerSetupTest() {
 		});
 };
 
+/**
+ * Test the methods which retrieve exchange rates
+ */
 const testExchangeRateRetrieval = function () {
 	console.log('Starting find exchange rate test');
 
@@ -321,6 +327,58 @@ const testExchangeRateRetrieval = function () {
 	});
 };
 
+/**
+ * Test the method which stores data to the database
+ */
+const testDBStorage = function testDBStorage() {
+	console.log('Starting DB storage test');
+
+	const startTime = Date.now();
+	const searchCriteria = {
+		from: 'from',
+		to: 'to',
+		rate: 'rate',
+		created_at: {
+			$gte: startTime
+		}
+	};
+
+	return dbOperations.storeExchangeRate('from', 'to', 'rate')
+		.then(function databaseCheck() {
+			console.log('Connecting to DB after storage');
+
+			const url = 'mongodb://' + dbConfig.host + ':' + dbConfig.port + '/' + dbConfig.database;
+
+			return MongoClient.connect(url);
+		}).then(function afterConnected(db) {
+			console.log('Connected to DB after storage');
+
+			let exchangeRateCollection = db.collection(dbConfig.collections.exchangeRate);
+			return exchangeRateCollection.find(searchCriteria)
+			.toArray().then(function checkArray(docs) {
+				if (docs.length < 1) {
+					throw new Error('Exchange rate record is not inserted');
+				} else {
+					console.log(docs.length + ' records found');
+				}
+				docs.forEach(function (element, index, array) {
+					assert.equal('from', element.from, 'From-currency field value is incorrect');
+					assert.equal('to', element.to, 'To-currency field value is incorrect');
+					assert.equal('rate', element.rate, 'Rate field value is incorrect');
+				});
+
+				console.log('Passed checking of inserted DB record(s), going to delete the data');
+
+				return exchangeRateCollection.deleteMany(searchCriteria);
+			}).then(function afterDeleting(results) {
+				db.close();
+				console.log('Result of deleting = ' + results);
+
+				console.log('DB storage test completed\r\n');
+			});
+		});
+};
+
 // Run the tests (synchronous tests)
 testEndConditions();
 testPayloadAttemptUpdate();
@@ -329,11 +387,12 @@ testPayloadAttemptUpdate();
 Promise.all([
 	consumerSetupTest(),
 	producerSetupTest(),
-	testExchangeRateRetrieval()
+	testExchangeRateRetrieval(),
+	testDBStorage()
 ]).then(function () {
-	console.log('Asynchronous test finished');
+	console.log('Asynchronous tests finished');
 	process.exit();
 }).catch(function (error) {
-	console.error('Asynchronous test has error ' + error);
+	console.error('Certain asynchronous test has error ' + error);
 	process.exit(1);
 });

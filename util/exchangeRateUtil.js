@@ -1,3 +1,6 @@
+/**
+ * A util class which helps to retrieve exchange rate from specified exchange rate source
+ */
 'use strict';
 
 // nodeJS modules

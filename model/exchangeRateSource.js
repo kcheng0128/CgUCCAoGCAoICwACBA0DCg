@@ -1,11 +1,15 @@
 /**
+ * Contains classes which each provides a source of exchange rate (using HTTP Get) and the method to parse
+ * the exchange rate from HTTP GET response.
+ *
+ * @typedef {object} ExchangeRateSource 	a class with the following interface
  * interface ExchangeRateSource {
  *
  *		getRequestUrl(fromCurrency, toCurrency) {
  *			// return an request option for sending the request
  *		}
  *
- *		getExchangeRate(chunks, hasMoreChunkCallback, fromCurrency, toCurrency, callback) {
+ *		getExchangeRate(responseAsString, fromCurrency, toCurrency, callback) {
  *			// parse the http response and return the exchange rate
  *	    }
  *

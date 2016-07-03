@@ -13,3 +13,4 @@ dbOperations.js - contains DB operations related methods
 - winston (Logging)  
 - bluebird (Promise related)  
 - fivebeans (Beantalk client)  
+- mongodb (Mongo DB Client)
